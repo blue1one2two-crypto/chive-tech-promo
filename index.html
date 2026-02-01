@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绿色黄金 V2.3 —— 廊坊农科院韭菜科技展示 (标准化交付版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #2ecc71;
+            --dark-green: #061306;
+            --gold: #d4af37;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--dark-green);
+            color: #f0f0f0;
+            font-family: 'Noto Sans SC', 'Inter', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            scroll-behavior: smooth;
+        }
+
+        .tech-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 50% 100%, rgba(46, 204, 113, 0.1) 0%, transparent 60%),
+                linear-gradient(rgba(46, 204, 113, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(46, 204, 113, 0.01) 1px, transparent 1px);
+            background-size: 100% 100%, 80px 80px, 80px 80px;
+            z-index: -1;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: var(--primary-green);
+            background: rgba(46, 204, 113, 0.08);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px -10px rgba(46, 204, 113, 0.3);
+        }
+
+        .section-padding {
+            padding: 8rem 2rem;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 30px rgba(46, 204, 113, 0.6);
+        }
+
+        .gold-glow {
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+        }
+
+        .image-container {
+            overflow: hidden;
+            border-radius: 1.2rem;
+            position: relative;
+            background: #0a0a0a;
+            aspect-ratio: 4/3;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            cursor: zoom-in;
+        }
+
+        .image-container:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Lightbox */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 100px rgba(46, 204, 113, 0.2);
+        }
+
+        .music-player {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+        }
+
+        .reveal {
+            opacity: 1;
+        }
+
+        .text-bright {
+            color: #ffffff !important;
+        }
+
+        .text-body {
+            color: #e5e7eb !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tech-bg"></div>
+
+    <!-- Lightbox Structure -->
+    <div id="lightbox" onclick="this.style.display='none'">
+        <img id="lightboxImg" src="" alt="Zoomed Image">
+        <div class="absolute top-8 right-8 text-4xl text-white/50 hover:text-white transition cursor-pointer">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+
+    <!-- 音乐开关 -->
+    <div class="music-player">
+        <button id="toggleMusic"
+            class="glass-panel p-5 flex items-center space-x-4 hover:border-primary-green transition group">
+            <div class="relative w-8 h-8">
+                <div
+                    class="absolute inset-0 border-2 border-primary-green rounded-full animate-ping opacity-25 group-hover:opacity-50">
+                </div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="fas fa-play text-primary-green text-sm" id="musicIcon"></i>
+                </div>
+            </div>
+            <div class="flex flex-col items-start leading-none text-white">
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-80">BGM ACTIVE</span>
+                <span class="text-xs font-bold mt-1 text-primary-green">王者战歌 · Chive Tech</span>
+            </div>
+        </button>
+        <audio id="bgMusic" loop preload="auto">
+            <source src="war_song_placeholder.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- 导航 (Centered Design) -->
+    <nav class="fixed top-0 left-0 w-full z-50 p-4 md:p-6 flex justify-center items-center pointer-events-none">
+        <div
+            class="glass-panel px-6 md:px-12 py-3 md:py-4 flex items-center space-x-6 md:space-x-12 pointer-events-auto border-white/10">
+            <div class="flex items-center space-x-3 pr-4 md:pr-8 border-r border-white/20">
+                <i class="fas fa-leaf text-primary-green text-lg md:text-xl"></i>
+                <span class="text-lg md:text-xl font-black italic tracking-tighter text-white">LF-AGRI</span>
+            </div>
+            <div class="hidden md:flex space-x-10 text-[10px] font-black tracking-[0.4em] uppercase text-white/70">
+                <a href="#hero" class="hover:text-primary-green transition">首页</a>
+                <a href="#intro" class="hover:text-primary-green transition">团队</a>
+                <a href="#breeding" class="hover:text-primary-green transition">品种</a>
+                <a href="#tech" class="hover:text-primary-green transition">科技</a>
+                <a href="#base" class="hover:text-primary-green transition">基地</a>
+            </div>
+            <div class="md:hidden flex items-center">
+                <i class="fas fa-bars text-white/50 text-sm"></i>
+            </div>
+        </div>
+    </nav>
+
+    <div id="content">
+        <!-- HERO -->
+        <section id="hero" class="h-screen flex items-center justify-center relative section-padding overflow-hidden">
+            <div class="absolute inset-0 z-0 ">
+                <img src="image1.png" class="w-full h-full object-cover  " alt="Background">
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-green via-transparent to-dark-green"></div>
+            </div>
+            <div class="relative z-10 text-center space-y-12 max-w-6xl px-4">
+                <div
+                    class="reveal inline-block px-8 py-2 border-2 border-primary-green/20 rounded-full text-[12px] tracking-[0.6em] font-black text-primary-green uppercase mb-4 shadow-[0_0_30px_rgba(46,204,113,0.1)]">
+                    National Agricultural Innovation
+                </div>
+                <h1 class="text-8xl md:text-[12rem] font-black italic tracking-tighter leading-none reveal select-none">
+                    绿色<span class="text-primary-green text-glow">黄金</span> —— 韭菜
+                </h1>
+                <p
+                    class="text-2xl md:text-4xl font-light text-gray-300 tracking-[0.3em] leading-relaxed reveal max-w-4xl mx-auto">
+                    科技育种，绿色栽培 —— 引领中国韭菜产业高质量发展
+                </p>
+                <div class="reveal pt-12">
+                    <div class="w-px h-24 bg-gradient-to-b from-primary-green to-transparent mx-auto"></div>
+                    <div class="mt-4 text-[10px] text-gray-500 uppercase tracking-widest font-bold">Scroll to Explore
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTRO & TEAM (Balanced Grid) -->
+        <section id="intro" class="section-padding">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid lg:grid-cols-12 gap-16 items-center">
+                    <div class="lg:col-span-12 md:text-center mb-16 reveal">
+                        <span
+                            class="text-xs font-black tracking-[0.6em] text-primary-green uppercase mb-4 block">Walking
+                            into LF-AGRI</span>
+                        <h2 class="text-6xl md:text-8xl font-black italic">走进廊坊农科院</h2>
+                    </div>
+                    <div class="lg:col-span-7 space-y-10 reveal">
+                        <div class="space-y-8 text-xl text-gray-400 font-light leading-relaxed">
+                            <p class="text-3xl text-white font-bold tracking-tight">揭秘一支专注韭菜育种与栽培技术的科研团队，如何用科技赋能农业。</p>
+                            <p>廊坊市农林科学院韭菜研发团队，数十年来躬身于韭菜育种及栽培技术的研发。团队培育了多个韭菜新品种，拥有多件国家发明专利及实用新型专利，荣获省市级科技进步奖多项。为河北省韭菜产业提供了品种支持及创新技术引领。
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-12 py-10 border-y border-white/5">
+                            <a href="#intro" class="group block transition transform hover:scale-105">
+                                <div class="text-5xl font-black text-white group-hover:text-primary-green transition">
+                                    40+</div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-2">科研年限</div>
+                            </a>
+                            <a href="#patents" class="group block transition transform hover:scale-105">
+                                <div class="text-5xl font-black text-primary-green group-hover:text-glow transition">26+
+                                </div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-2">核心专利</div>
+                            </a>
+                            <a href="#base" class="group block transition transform hover:scale-105">
+                                <div class="text-5xl font-black text-gold group-hover:gold-glow transition">1019<span
+                                        class="text-xs">亩</span></div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-2">单一基地示范</div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5 reveal">
+                        <div class="image-container glass-panel p-4 group">
+                            <img src="image4.jpeg" onclick="openLightbox(this.src)" class="rounded-xl  hover:-0"
+                                alt="Team">
+                            <div
+                                class="absolute inset-0 bg-primary-green/10 opacity-0 group-hover:opacity-100 transition duration-500 pointer-events-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BREEDING & VARIETIES (Corrected Balance) -->
+        <section id="breeding" class="section-padding bg-black/40 relative">
+            <div class="max-w-7xl mx-auto relative z-10">
+                <div class="text-center mb-32 reveal">
+                    <h2
+                        class="text-7xl font-black italic tracking-tighter opacity-10 leading-none absolute left-0 right-0 -top-12 select-none uppercase">
+                        Scientific Research</h2>
+                    <h3 class="text-5xl md:text-7xl font-black italic relative">卓越品种 · 表现卓越</h3>
+                    <div class="w-32 h-2 bg-primary-green mx-auto mt-8"></div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12">
+                    <!-- Unit 01 -->
+                    <div class="glass-panel p-12 space-y-10 reveal">
+                        <div class="flex justify-between items-center">
+                            <div
+                                class="px-6 py-2 bg-primary-green/20 text-primary-green text-xs font-black rounded-full uppercase">
+                                Variety 01</div>
+                        </div>
+                        <h4 class="text-5xl font-black italic">棚选 18 号</h4>
+                        <div class="prose prose-invert max-w-none text-gray-400 font-light leading-relaxed">
+                            <p>株高可达 51.8 厘米，叶片宽大、深绿直立，适合露地、设施、盆栽及韭黄生产。露地当年亩产超 3000 公斤，温室亩产可达 <b class="text-white">12500
+                                    公斤/年</b>。其粗纤维含量低，口感软滑，风味浓郁。</p>
+                        </div>
+                        <div class="image-container shadow-2xl">
+                            <img src="image8.jpeg" onclick="openLightbox(this.src)" alt="18号">
+                        </div>
+                    </div>
+                    <!-- Unit 02 -->
+                    <div class="glass-panel p-12 space-y-10 reveal border-gold/30">
+                        <div class="flex justify-between items-center">
+                            <div class="px-6 py-2 bg-gold/20 text-gold text-xs font-black rounded-full uppercase">
+                                Variety 02</div>
+                        </div>
+                        <h4 class="text-5xl font-black italic text-gold">廊韭 19 号</h4>
+                        <div class="prose prose-invert max-w-none text-gray-400 font-light leading-relaxed">
+                            <p>抗灰霉病能力强，富硒性能突出，休眠型品种，适合露地与盆栽生产，年产量可达 <b class="text-white">9000
+                                    公斤以上</b>。具备卓越的存储适应性与市场竞争力。</p>
+                        </div>
+                        <div class="image-container shadow-2xl">
+                            <img src="image9.jpeg" onclick="openLightbox(this.src)" alt="19号">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-20 glass-panel p-12 grid md:grid-cols-12 gap-12 items-center reveal">
+                    <div class="md:col-span-4 space-y-6">
+                        <h5 class="text-2xl font-bold italic">生长轨迹与茎粗数据</h5>
+                        <p class="text-sm text-gray-500 leading-relaxed font-light">实验室全量记录，揭示新品种在不同气候条件下的生理爆发力与稳定性平衡。
+                        </p>
+                    </div>
+                    <div class="md:col-span-8 grid grid-cols-2 gap-6">
+                        <div class="image-container aspect-video"><img src="image10.png"
+                                onclick="openLightbox(this.src)" alt="Data1"></div>
+                        <div class="image-container aspect-video"><img src="image11.png"
+                                onclick="openLightbox(this.src)" alt="Data2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TECHNOLOGY 12-32 (Deep Reconstruction) -->
+        <section id="tech" class="section-padding">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-24 reveal">
+                    <span class="text-xs font-black tracking-[0.5em] text-gold uppercase">Technology Ecosystem</span>
+                    <h2 class="text-6xl font-black italic mt-4">绿色技术 · 高效栽培</h2>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-10">
+                    <!-- Column 1: Mechanical -->
+                    <div class="space-y-10 reveal">
+                        <div class="glass-panel p-8 group overflow-hidden h-full">
+                            <div class="flex items-center space-x-4 mb-8">
+                                <i class="fas fa-tractor text-3xl text-primary-green"></i>
+                                <h4 class="text-2xl font-black italic">机械化播种</h4>
+                            </div>
+                            <p class="text-sm text-gray-500 leading-relaxed mb-6">
+                                采用自主研发的韭菜播种机，省种、省工、省时。成簇生长，当年播种当年收获。特别研发：<b class="text-white">手推式穴播抽拉式下籽轻便型播种装置</b>。
+                            </p>
+                            <img src="image17.png" onclick="openLightbox(this.src)"
+                                class="rounded-xl w-full border border-white/5  group-hover:opacity-100 transition"
+                                alt="Mech">
+                        </div>
+                    </div>
+                    <!-- Column 2: Protection -->
+                    <div class="space-y-10 reveal" style="transition-delay: 0.1s">
+                        <div class="glass-panel p-8 h-full">
+                            <div class="flex items-center space-x-4 mb-8">
+                                <i class="fas fa-shield-virus text-3xl text-gold"></i>
+                                <h4 class="text-2xl font-black italic uppercase tracking-tighter">Biosecurity</h4>
+                            </div>
+                            <ul class="space-y-6 text-sm text-gray-400 font-light">
+                                <li class="flex gap-4"><i class="fas fa-check-circle text-gold mt-1"></i>
+                                    <div><b>韭蛆防治：</b>以虫治虫，施用昆虫病原线虫，替代化学农药。</div>
+                                </li>
+                                <li class="flex gap-4"><i class="fas fa-check-circle text-gold mt-1"></i>
+                                    <div><b>蓟马防控：</b>蓝板诱杀+信息素诱芯，物理诱杀无残留。</div>
+                                </li>
+                                <li class="flex gap-4"><i class="fas fa-check-circle text-gold mt-1"></i>
+                                    <div><b>水肥一体：</b>微喷蝶形喷头，每日定时喷水 20 分钟集成防治。</div>
+                                </li>
+                            </ul>
+                            <div class="grid grid-cols-2 gap-4 mt-12">
+                                <img src="image20.jpeg" onclick="openLightbox(this.src)"
+                                    class="rounded-lg h-24 w-full object-cover  hover:-0 hover:scale-110 transition"
+                                    alt="C1">
+                                <img src="image22.jpeg" onclick="openLightbox(this.src)"
+                                    class="rounded-lg h-24 w-full object-cover  hover:-0 hover:scale-110 transition"
+                                    alt="C2">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Column 3: Science -->
+                    <div class="space-y-10 reveal" style="transition-delay: 0.2s">
+                        <div class="glass-panel p-8 h-full bg-blue-500/5">
+                            <div class="flex items-center space-x-4 mb-8">
+                                <i class="fas fa-microscope text-3xl text-blue-400"></i>
+                                <h4 class="text-2xl font-black italic">前沿生命科学</h4>
+                            </div>
+                            <div class="space-y-8 text-sm text-gray-400 leading-relaxed font-light">
+                                <div class="bg-white/5 p-4 rounded-lg"><b>组培快繁：</b>建立花器官再生体系，实现特异植株精准保种。</div>
+                                <div class="bg-white/5 p-4 rounded-lg"><b>辐射诱变：</b>改良品种抗性，奠定抗灰霉病选育基础。</div>
+                                <div class="bg-white/5 p-4 rounded-lg"><b>雄性不育：</b>深入揭示遗传机理，优化高效制种链路。</div>
+                            </div>
+                            <img src="image15.png" onclick="openLightbox(this.src)"
+                                class="rounded-xl w-full mt-10   hover:brightness-100 transition" alt="Lab">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PATENTS WALL (Fixing Grid & Blurry) -->
+        <section id="patents" class="section-padding bg-black/20">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8 reveal">
+                    <div class="max-w-xl space-y-6">
+                        <h2 class="text-5xl font-black italic">多维度认证 · 权威背书</h2>
+                        <p class="text-gray-500 font-light italic">点击证书图片可查看 4K 级清晰大图。涵盖 2023-2025 全套品种认定及发明专利。</p>
+                    </div>
+                    <div class="text-right glass-panel px-8 py-4 border-gold/40 select-none">
+                        <div class="text-3xl font-black text-gold gold-glow font-heading italic tracking-[0.2em]">
+                            CERTIFIED</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 reveal">
+                    <div class="glass-panel p-4 group">
+                        <div class="image-container aspect-[3/4] mb-4"><img src="image7.jpeg"
+                                onclick="openLightbox(this.src)" alt="7"></div>
+                        <div class="text-[9px] font-black text-primary-green tracking-widest uppercase">Variety Approval
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4 group">
+                        <div class="image-container aspect-[3/4] mb-4"><img src="image13.png"
+                                onclick="openLightbox(this.src)" alt="13"></div>
+                        <div class="text-[9px] font-black text-gold tracking-widest uppercase">Provincial Result</div>
+                    </div>
+                    <div class="glass-panel p-4 group">
+                        <div class="image-container aspect-[3/4] mb-4"><img src="image14.jpeg"
+                                onclick="openLightbox(this.src)" alt="14"></div>
+                        <div class="text-[9px] font-black text-primary-green tracking-widest uppercase">Invention Patent
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4 group">
+                        <div class="image-container aspect-[3/4] mb-4"><img src="image16.png"
+                                onclick="openLightbox(this.src)" alt="16"></div>
+                        <div class="text-[9px] font-black text-blue-400 tracking-widest uppercase">Utility Patent</div>
+                    </div>
+                    <div class="glass-panel p-4 group">
+                        <div class="image-container aspect-[3/4] mb-4"><img src="image19.png"
+                                onclick="openLightbox(this.src)" alt="19"></div>
+                        <div class="text-[9px] font-black text-primary-green tracking-widest uppercase">Mech Device
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4 group">
+                        <div class="image-container aspect-[3/4] mb-4"><img src="image28.jpeg"
+                                class="rotate-90 scale-75" onclick="openLightbox(this.src)" alt="28"></div>
+                        <div class="text-[9px] font-black text-gold tracking-widest uppercase">Efficient Grow</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BASE ARCHIVES (Deep Reconstruction) -->
+        <section id="base" class="section-padding overflow-hidden">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-24 reveal text-center">
+                    <span class="text-xs font-black tracking-[0.6em] text-blue-400 uppercase">Industrial Scale</span>
+                    <h2 class="text-6xl font-black italic mt-4 text-glow">产业融合 · 基地档案</h2>
+                    <p class="text-gray-500 mt-4 italic">展示各大示范基地的真实生产环境、科研工作记录及团队风采。</p>
+                </div>
+
+                <div class="space-y-32">
+                    <!-- Base 01: 武强 -->
+                    <div class="reveal grid lg:grid-cols-12 gap-12 items-start">
+                        <div class="lg:col-span-5 space-y-8">
+                            <div class="flex items-center space-x-4">
+                                <span class="text-6xl font-black text-blue-400 opacity-20">01</span>
+                                <h3 class="text-4xl font-black italic">武强示范基地</h3>
+                            </div>
+                            <div class="glass-panel p-8 space-y-6">
+                                <p class="text-sm text-gray-400 leading-relaxed font-light">
+                                    作为廊坊农科院与赛元河北生物有限公司深度合作的核心基地，武强基地专注于<b class="text-blue-400">“棚选 18 号”</b>的规模化种植与示范。
+                                </p>
+                                <ul class="text-xs space-y-4">
+                                    <li class="flex justify-between border-b border-white/5 pb-2">
+                                        <span
+                                            class="text-gray-500 uppercase tracking-widest text-[10px] font-bold">累计面积</span>
+                                        <span class="text-white font-bold">600 亩</span>
+                                    </li>
+                                    <li class="flex justify-between border-b border-white/5 pb-2">
+                                        <span
+                                            class="text-gray-500 uppercase tracking-widest text-[10px] font-bold">主推品种</span>
+                                        <span class="text-blue-400 font-bold">棚选 18 号</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="image-container aspect-[9/16] md:row-span-2 shadow-2xl hidden md:block"
+                                data-asset-type="field" title="武强核心育种区全景">
+                                <img src="image34.jpeg" onclick="openLightbox(this.src)" alt="武强示范基地 - 核心育种规模展示"
+                                    class="object-top">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    基地景观</div>
+                            </div>
+                            <div class="image-container aspect-video md:aspect-square shadow-xl"
+                                data-asset-type="action" title="现代化播种作业">
+                                <img src="image35.jpeg" onclick="openLightbox(this.src)" alt="武强示范基地 - 机械穴播作业实况">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    播种作业</div>
+                            </div>
+                            <div class="image-container aspect-video md:aspect-square shadow-xl border border-blue-400/20"
+                                data-asset-type="internal" title="科研观察记录">
+                                <img src="image31.jpeg" onclick="openLightbox(this.src)" alt="武强示范基地 - 韭菜生长性状科研记录">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    科研观察单位</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Base 02: 霸州 -->
+                    <div class="reveal grid lg:grid-cols-12 gap-12 items-start">
+                        <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-4 order-2 lg:order-1">
+                            <div class="image-container aspect-video md:aspect-square shadow-xl"
+                                data-asset-type="internal" title="温室标准化培育">
+                                <img src="image36.jpeg" onclick="openLightbox(this.src)" alt="霸州南孟基地 - 数字化温室环境控制">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    大棚实景</div>
+                            </div>
+                            <div class="image-container aspect-video md:aspect-square shadow-xl"
+                                data-asset-type="action" title="产后品牌化分装">
+                                <img src="image24.jpeg" onclick="openLightbox(this.src)" alt="霸州南孟基地 - 盆栽韭菜商品化包装">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    分装作业</div>
+                            </div>
+                            <div class="image-container aspect-video col-span-1 md:col-span-2 shadow-2xl border border-gold/20"
+                                data-asset-type="field" title="盆栽展示示范园">
+                                <img src="image35.jpeg" onclick="openLightbox(this.src)" alt="霸州南孟基地 - 规模化盆栽产业示范">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    盆栽基地</div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-5 space-y-8 order-1 lg:order-2 lg:text-right">
+                            <div class="flex items-center space-x-4 lg:justify-end">
+                                <h3 class="text-4xl font-black italic">霸州南孟基地</h3>
+                                <span class="text-6xl font-black text-gold opacity-20">02</span>
+                            </div>
+                            <div class="glass-panel p-8 space-y-6">
+                                <p class="text-sm text-gray-400 leading-relaxed font-light">
+                                    深度合作 5 年，是盆栽韭菜种植及新品种核心示范的关键节点。为其提供全套智力支持与种质资源。
+                                </p>
+                                <ul class="text-xs space-y-4">
+                                    <li class="flex justify-between border-b border-white/5 pb-2">
+                                        <span
+                                            class="text-gray-500 uppercase tracking-widest text-[10px] font-bold">示范面积</span>
+                                        <span class="text-white font-bold">819 亩</span>
+                                    </li>
+                                    <li class="flex justify-between border-b border-white/5 pb-2">
+                                        <span
+                                            class="text-gray-500 uppercase tracking-widest text-[10px] font-bold">核心定位</span>
+                                        <span class="text-gold font-bold">盆栽产业化</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Base 03: 香河 -->
+                    <div class="reveal grid lg:grid-cols-12 gap-12 items-start">
+                        <div class="lg:col-span-5 space-y-8">
+                            <div class="flex items-center space-x-4">
+                                <span class="text-6xl font-black text-primary-green opacity-20">03</span>
+                                <h3 class="text-4xl font-black italic">香河孙营庄基地</h3>
+                            </div>
+                            <div class="glass-panel p-8 space-y-6">
+                                <p class="text-sm text-gray-400 leading-relaxed font-light">
+                                    香河县安头屯镇孙营庄村，是廊坊浓乡情农业科技有限公司承接的露地绿色韭菜核心示范区。
+                                </p>
+                                <ul class="text-xs space-y-4">
+                                    <li class="flex justify-between border-b border-white/5 pb-2">
+                                        <span
+                                            class="text-gray-500 uppercase tracking-widest text-[10px] font-bold">示范面积</span>
+                                        <span class="text-white font-bold">1019 亩</span>
+                                    </li>
+                                    <li class="flex justify-between border-b border-white/5 pb-2">
+                                        <span
+                                            class="text-gray-500 uppercase tracking-widest text-[10px] font-bold">基地属性</span>
+                                        <span class="text-primary-green font-bold">露地绿色核心</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="image-container aspect-video col-span-1 md:col-span-2 shadow-2xl border border-primary-green/20"
+                                data-asset-type="field">
+                                <img src="image30.jpeg" onclick="openLightbox(this.src)" alt="露地绿色化种植 - 核心展示区">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    生态全景</div>
+                            </div>
+                            <div class="image-container aspect-video md:aspect-square shadow-xl"
+                                data-asset-type="internal">
+                                <img src="image25.jpeg" onclick="openLightbox(this.src)" alt="设施大棚内部 - 数字化农业">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    棚内环境</div>
+                            </div>
+                            <div class="image-container aspect-video md:aspect-square shadow-xl"
+                                data-asset-type="action">
+                                <img src="image17.png" onclick="openLightbox(this.src)" alt="标准化播种作业 - 孙营庄示范">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    机械作业</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Base 04: 藁城 -->
+                    <div class="reveal grid lg:grid-cols-12 gap-12 items-start">
+                        <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-4 order-2 lg:order-1">
+                            <div class="image-container aspect-[9/16] md:row-span-2 shadow-2xl hidden md:block"
+                                data-asset-type="field">
+                                <img src="image32.png" onclick="openLightbox(this.src)" alt="富硒韭菜示范园 - 藁城地标"
+                                    class="object-top">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    园区全景</div>
+                            </div>
+                            <div class="image-container aspect-video md:aspect-square shadow-xl"
+                                data-asset-type="internal">
+                                <img src="image20.jpeg" onclick="openLightbox(this.src)" alt="绿色防治技术应用 - 薊马防控">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    技术细节</div>
+                            </div>
+                            <div class="image-container aspect-video md:aspect-square shadow-xl border border-white/20"
+                                data-asset-type="action">
+                                <img src="image4.jpeg" onclick="openLightbox(this.src)" alt="政企研深度合影 - 藁城交流会">
+                                <div
+                                    class="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[10px] text-white">
+                                    座谈实录</div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-5 space-y-8 order-1 lg:order-2 lg:text-right">
+                            <div class="flex items-center space-x-4 lg:justify-end">
+                                <h3 class="text-4xl font-black italic">藁城富硒基地</h3>
+                                <span class="text-6xl font-black text-white opacity-20">04</span>
+                            </div>
+                            <div class="glass-panel p-8 space-y-6">
+                                <p class="text-sm text-gray-400 leading-relaxed font-light">
+                                    重点开展<b>富硒韭菜</b>科技成果转化，与农技单位、企业协会深度座谈交流，构建产研一体化链条。
+                                </p>
+                                <div class="bg-white/5 p-4 rounded-lg text-[10px] text-gray-500 italic">
+                                    “与藁城农业农村局相关负责人进行座谈交流”
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MORE SHOWCASE -->
+                <div class="mt-48 reveal">
+                    <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+                        <div>
+                            <span class="text-xs font-black tracking-[0.5em] text-gray-500 uppercase">Gallery
+                                Extension</span>
+                            <h2 class="text-5xl font-black italic mt-4">更多精彩展示</h2>
+                        </div>
+                        <div class="text-gray-500 italic text-sm">记录点滴科研与生态之美</div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image15.png" onclick="openLightbox(this.src)" alt="Extra 1">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">组培快繁技术</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image16.png" onclick="openLightbox(this.src)" alt="Extra 2">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">专利认证展示</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image20.jpeg" onclick="openLightbox(this.src)" alt="Extra 3">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">韭蛆物理防治</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image22.jpeg" onclick="openLightbox(this.src)" alt="Extra 4">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">蓝板诱杀技术</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image27.jpeg" onclick="openLightbox(this.src)" alt="Extra 5">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">水肥一体化시설</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image30.jpeg" onclick="openLightbox(this.src)" alt="Extra 6">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">新品种田间表现</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image40.jpeg" onclick="openLightbox(this.src)" alt="Extra 7">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">实验室分析记录</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image41.jpeg" onclick="openLightbox(this.src)" alt="Extra 8">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">基地秋季景观</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image70.jpeg" onclick="openLightbox(this.src)" alt="Extra 9">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">种子萌发观察</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image71.jpeg" onclick="openLightbox(this.src)" alt="Extra 10">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">根系生长研究</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image72.jpeg" onclick="openLightbox(this.src)" alt="Extra 11">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">抗性对比实验</span>
+                            </div>
+                        </div>
+                        <div class="image-container aspect-square shadow-xl group">
+                            <img src="image14.jpeg" onclick="openLightbox(this.src)" alt="Extra 12">
+                            <div
+                                class="absolute inset-0 bg-primary-green/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">发明专利证书</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- FOOTER: SUMMARY (Slide 39) -->
+        <footer class="section-padding bg-gradient-to-t from-black to-dark-green relative text-center">
+            <div class="absolute inset-0 opacity-5 pointer-events-none">
+                <img src="image32.png" class="w-full h-full object-cover" alt="Leaf">
+            </div>
+            <div class="max-w-7xl mx-auto relative z-10 space-y-16">
+                <div class="w-px h-32 bg-primary-green mx-auto"></div>
+                <h2
+                    class="text-4xl md:text-7xl lg:text-8xl font-black italic tracking-tighter leading-[1.1] reveal px-4">
+                    一粒种子可以遍布原野；<br>
+                    <span class="text-primary-green text-glow block mt-4">一项技术可以拉动一个产业。</span>
+                </h2>
+                <p
+                    class="text-lg md:text-2xl font-light text-gray-400 reveal leading-relaxed tracking-[0.2em] italic max-w-4xl mx-auto">
+                    廊坊韭菜研发团队，以科技为笔，以大地为纸，<br>
+                    书写着中国韭菜产业高质量发展的绿色篇章。
+                </p>
+                <div class="pt-24 border-t border-white/5  text-[9px] uppercase tracking-[1em] font-black">
+                    谢谢观看 · 廊坊市农林科学院韭菜课题组
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Lightbox Control
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.style.display = 'flex';
+        }
+
+        // 音乐交互
+        const musicBtn = document.getElementById('toggleMusic');
+        const bgMusic = document.getElementById('bgMusic');
+        const musicIcon = document.getElementById('musicIcon');
+        let isPlaying = false;
+
+        musicBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                bgMusic.pause();
+                musicIcon.className = 'fas fa-play text-primary-green text-sm';
+            } else {
+                bgMusic.play().catch(e => console.log(e));
+                musicIcon.className = 'fas fa-pause text-primary-green text-sm text-glow';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // 通用 reveal 动画
+        document.querySelectorAll('.reveal').forEach(el => {
+            gsap.from(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 85%",
+                    toggleActions: "play none none none"
+                },
+                y: 60, opacity: 0, duration: 1.5, ease: "power4.out"
+            });
+        });
+
+        // 导航背景随滚动变色
+        ScrollTrigger.create({
+            trigger: "body", start: "100 top",
+            onEnter: () => gsap.to("nav .glass-panel", { background: "rgba(0,0,0,0.8)", duration: 0.5 }),
+            onLeaveBack: () => gsap.to("nav .glass-panel", { background: "rgba(255,255,255,0.05)", duration: 0.5 })
+        });
+    </script>
+</body>
+
+</html>
